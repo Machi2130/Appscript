@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Opportunities Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .input-section {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #e1e8ff;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            min-width: 120px;
+        }
+
+        .form-group input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            min-width: 250px;
+        }
+
+        .form-group input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .preset-sectors {
+            margin: 20px 0;
+        }
+
+        .preset-sectors h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .sector-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .sector-tag {
+            background: #e1e8ff;
+            color: #667eea;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .sector-tag:hover {
+            background: #667eea;
+            color: white;
+            border-color: #764ba2;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .loading .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .results-content {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e1e8ff;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .markdown-content {
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+        }
+
+        .markdown-content h1 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .markdown-content h2 {
+            color: #764ba2;
+            margin: 20px 0 10px 0;
+            font-size: 1.4em;
+        }
+
+        .markdown-content h3 {
+            color: #333;
+            margin: 15px 0 8px 0;
+        }
+
+        .markdown-content ul, .markdown-content ol {
+            margin: 10px 0 10px 20px;
+        }
+
+        .markdown-content li {
+            margin: 5px 0;
+        }
+
+        .markdown-content strong {
+            color: #667eea;
+        }
+
+        .download-btn {
+            background: #28a745;
+            margin-left: 10px;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #f5c6cb;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #c3e6cb;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .api-config {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .api-config h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .api-url-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-connected {
+            background-color: #28a745;
+        }
+
+        .status-disconnected {
+            background-color: #dc3545;
+        }
+
+        .metadata-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.9em;
+            border-left: 4px solid #667eea;
+        }
+
+        .metadata-info h4 {
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .metadata-info .badge {
+            background: #667eea;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+
+        .source-list {
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.85em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .form-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-group input {
+                min-width: auto;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .results-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Trade Opportunities Analyzer</h1>
+            <p>Get AI-powered market analysis for Indian sectors</p>
+        </div>
+
+        <div class="api-config">
+            <h3>API Configuration</h3>
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <span class="status-indicator" id="connectionStatus"></span>
+                <span id="connectionText">Testing connection...</span>
+            </div>
+            <label for="apiUrl">API Base URL:</label>
+            <input type="url" id="apiUrl" class="api-url-input" value="http://localhost:8000" placeholder="http://localhost:8000">
+            <button class="btn" onclick="testConnection()" style="margin-top: 10px;">Test Connection</button>
+            <small style="color: #856404; display: block; margin-top: 5px;">Make sure your FastAPI server is running on this URL</small>
+        </div>
+
+        <div class="input-section">
+            <div class="form-group">
+                <label for="sectorInput">Sector:</label>
+                <input type="text" id="sectorInput" placeholder="Enter sector name (e.g., pharmaceuticals, technology)" autocomplete="off">
+                <button class="btn" onclick="analyzeSector()">Analyze Market</button>
+            </div>
+
+            <div class="preset-sectors">
+                <h3>Popular Sectors:</h3>
+                <div class="sector-tags">
+                    <div class="sector-tag" onclick="selectSector('pharmaceuticals')">Pharmaceuticals</div>
+                    <div class="sector-tag" onclick="selectSector('technology')">Technology</div>
+                    <div class="sector-tag" onclick="selectSector('agriculture')">Agriculture</div>
+                    <div class="sector-tag" onclick="selectSector('banking')">Banking</div>
+                    <div class="sector-tag" onclick="selectSector('textiles')">Textiles</div>
+                    <div class="sector-tag" onclick="selectSector('automotive')">Automotive</div>
+                    <div class="sector-tag" onclick="selectSector('energy')">Energy</div>
+                    <div class="sector-tag" onclick="selectSector('infrastructure')">Infrastructure</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing market data and generating insights...</p>
+            <p><small>This may take 10-30 seconds</small></p>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="results-header">
+                <div>
+                    <h2>Market Analysis Report</h2>
+                    <p id="sectorName"></p>
+                </div>
+                <div>
+                    <button class="btn download-btn" onclick="downloadReport()">Download Report</button>
+                </div>
+            </div>
+            <div id="metadataInfo" class="metadata-info" style="display: none;"></div>
+            <div class="results-content">
+                <div class="markdown-content" id="reportContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentReport = '';
+        let currentSector = '';
+        let currentMetadata = {};
+        let sessionId = '';
+
+        // Initialize
+        document.getElementById('sectorInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                analyzeSector();
+            }
+        });
+
+        function selectSector(sector) {
+            document.getElementById('sectorInput').value = sector;
+            document.getElementById('sectorInput').focus();
+        }
+
+        function showMessage(message, isError = false) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            
+            if (isError) {
+                errorDiv.innerHTML = message;
+                errorDiv.style.display = 'block';
+                successDiv.style.display = 'none';
+            } else {
+                successDiv.innerHTML = message;
+                successDiv.style.display = 'block';
+                errorDiv.style.display = 'none';
+            }
+
+            // Auto hide after 8 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+            }, 8000);
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function updateConnectionStatus(connected, message) {
+            const statusIndicator = document.getElementById('connectionStatus');
+            const connectionText = document.getElementById('connectionText');
+            
+            if (connected) {
+                statusIndicator.className = 'status-indicator status-connected';
+                connectionText.textContent = message || 'Connected to API server';
+            } else {
+                statusIndicator.className = 'status-indicator status-disconnected';
+                connectionText.textContent = message || 'Cannot connect to API server';
+            }
+        }
+
+        async function testConnection() {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            
+            if (!apiUrl) {
+                updateConnectionStatus(false, 'Please enter API URL');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiUrl}/health`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateConnectionStatus(true, `Connected - Version ${data.version}`);
+                    showMessage('Successfully connected to API server!');
+                } else {
+                    updateConnectionStatus(false, `Server error: ${response.status}`);
+                    showMessage('API server responded but may have issues', true);
+                }
+            } catch (error) {
+                updateConnectionStatus(false, 'Connection failed');
+                showMessage(`Cannot connect to API server: ${error.message}`, true);
+            }
+        }
+
+        function displayMetadata(metadata) {
+            const metadataDiv = document.getElementById('metadataInfo');
+            
+            if (!metadata) {
+                metadataDiv.style.display = 'none';
+                return;
+            }
+
+            let html = '<h4>Analysis Metadata</h4>';
+            
+            // Analysis info
+            html += `<div style="margin-bottom: 10px;">`;
+            html += `<span class="badge">${metadata.mode || 'Unknown'}</span>`;
+            if (metadata.cached) {
+                html += `<span class="badge" style="background: #28a745;">Cached</span>`;
+            }
+            html += `</div>`;
+            
+            // Stats
+            if (metadata.urls_collected !== undefined) {
+                html += `<p><strong>URLs Collected:</strong> ${metadata.urls_collected}</p>`;
+            }
+            if (metadata.sources_scraped !== undefined) {
+                html += `<p><strong>Sources Scraped:</strong> ${metadata.sources_scraped}</p>`;
+            }
+            
+            // Scraped sources
+            if (metadata.scraped_sources && metadata.scraped_sources.length > 0) {
+                html += `<p><strong>Data Sources:</strong></p>`;
+                html += `<div class="source-list">`;
+                metadata.scraped_sources.forEach(source => {
+                    html += `<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px;">`;
+                    html += `<strong>${source.title}</strong> (${source.source})<br>`;
+                    html += `<small>${source.content_length} characters</small>`;
+                    html += `</div>`;
+                });
+                html += `</div>`;
+            }
+            
+            if (metadata.analysis_timestamp) {
+                html += `<p><small><strong>Generated:</strong> ${new Date(metadata.analysis_timestamp).toLocaleString()}</small></p>`;
+            }
+            
+            metadataDiv.innerHTML = html;
+            metadataDiv.style.display = 'block';
+        }
+
+        async function analyzeSector() {
+            const sector = document.getElementById('sectorInput').value.trim();
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+
+            if (!sector) {
+                showMessage('Please enter a sector name', true);
+                return;
+            }
+
+            if (!apiUrl) {
+                showMessage('Please enter the API base URL', true);
+                return;
+            }
+
+            // Validate sector name (basic validation)
+            if (sector.length < 2 || sector.length > 50) {
+                showMessage('Sector name must be between 2 and 50 characters', true);
+                return;
+            }
+
+            // Hide previous results and messages
+            hideMessages();
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('metadataInfo').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            // Disable the button
+            const analyzeBtn = document.querySelector('.btn');
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = 'Analyzing...';
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                };
+
+                if (sessionId) {
+                    headers['X-Session-ID'] = sessionId;
+                }
+
+                const response = await fetch(`${apiUrl}/analyze/${encodeURIComponent(sector)}`, {
+                    method: 'GET',
+                    headers: headers,
+                    mode: 'cors'
+                });
+
+                if (!response.ok) {
+                    let errorData;
+                    try {
+                        errorData = await response.json();
+                    } catch {
+                        errorData = { detail: `HTTP ${response.status}: ${response.statusText}` };
+                    }
+                    throw new Error(errorData.detail || `Server returned ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Store session ID if provided
+                if (data.session_id) {
+                    sessionId = data.session_id;
+                }
+                
+                // Store report data
+                currentReport = data.report;
+                currentSector = data.sector;
+                currentMetadata = data.metadata || {};
+
+                // Display results
+                document.getElementById('sectorName').textContent = `Sector: ${data.sector}`;
+                document.getElementById('reportContent').textContent = data.report;
+                
+                // Display metadata
+                displayMetadata({
+                    ...data.metadata,
+                    cached: data.cached
+                });
+                
+                // Show results section
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+
+                // Show success message
+                const cacheStatus = data.cached ? ' (from cache)' : '';
+                const pipelineInfo = data.pipeline ? ` using ${data.pipeline}` : '';
+                showMessage(`Analysis completed successfully${cacheStatus}${pipelineInfo}!`);
+
+                // Scroll to results
+                document.getElementById('resultsSection').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                
+                let errorMessage = 'Failed to analyze sector: ';
+                
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorMessage += 'Cannot connect to API server. Make sure the server is running and the URL is correct.';
+                } else if (error.message.includes('429')) {
+                    errorMessage += 'Rate limit exceeded. Please wait a moment and try again.';
+                } else if (error.message.includes('422')) {
+                    errorMessage += 'Invalid sector name. Please use only letters, numbers, spaces, and basic punctuation.';
+                } else if (error.message.includes('503')) {
+                    errorMessage += 'Service temporarily unavailable. External data sources may be down.';
+                } else if (error.message.includes('500')) {
+                    errorMessage += 'Internal server error. The service may be experiencing issues.';
+                } else {
+                    errorMessage += error.message;
+                }
+
+                showMessage(errorMessage, true);
+            } finally {
+                // Re-enable the button
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = 'Analyze Market';
+            }
+        }
+
+        function downloadReport() {
+            if (!currentReport) {
+                showMessage('No report available to download', true);
+                return;
+            }
+
+            const timestamp = new Date().toISOString().split('T')[0];
+            const filename = `${currentSector}_market_analysis_${timestamp}.md`;
+            
+            const blob = new Blob([currentReport], { type: 'text/markdown' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            showMessage('Report downloaded successfully!');
+        }
+
+        // Test API connection on page load
+        window.addEventListener('load', function() {
+            testConnection();
+        });
+    </script>
+</body>
+</html>
