@@ -1,42 +1,39 @@
 # FastAPI and ASGI server
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-python-multipart==0.0.6
+fastapi==0.110.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.9
 
 # HTTP client and async support
-aiohttp==3.9.0
-httpx==0.25.2
+aiohttp==3.9.3
+httpx==0.26.0
 
 # Web scraping libraries
-beautifulsoup4==4.12.2
+beautifulsoup4==4.12.3
 requests==2.31.0
-lxml==4.9.3
-trafilatura==1.6.3
+lxml==5.1.0
+trafilatura==1.8.0
 html5lib==1.1
 
-# Optional web scraping (advanced)
-crawl4ai==0.7.4
-
-
 # AI/LLM integration
-groq==0.4.1
+groq==0.4.2
 
 # Search API integration
 google-search-results==2.4.2
 
 # Data validation and serialization
-pydantic==2.5.0
+pydantic==2.8.2
+pydantic-core==2.20.1
 
 # Environment and configuration
-python-dotenv==1.0.0
+python-dotenv==1.0.1
 
 # Utilities
-python-dateutil==2.8.2
-urllib3==2.1.0
+python-dateutil==2.9.0
+urllib3==2.2.1
 
 # Security and validation
-markupsafe==2.1.3
+markupsafe==2.1.5
 
 # Optional: Development and testing
-pytest==7.4.3
-pytest-asyncio==0.21.1
+pytest==8.1.1
+pytest-asyncio==0.23.6
