@@ -15,7 +15,8 @@ lxml==4.9.3
 html5lib==1.1
 
 # Optional web scraping (advanced)
-crawl4ai==0.2.77
+crawl4ai==0.7.4
+
 
 # AI/LLM integration
 groq==0.4.1
