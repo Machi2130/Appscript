@@ -58,7 +58,7 @@ def sanitize_input(text: str, max_length: int = 1000, preserve_markdown: bool = 
     text = text[:max_length]
     
     if preserve_markdown:
-        # Keep markdown symbols for structure (#, -, |), but remove dangerous characters
+        # Keep markdown symbols for structure (#, -, |)
         text = re.sub(r'[<>"\'`]', '', text)
         # Remove inline * for italics/bold but keep bullets at line start
         text = re.sub(r'(?<!^)\*(?! )', '', text, flags=re.MULTILINE)
@@ -113,7 +113,7 @@ def handle_error(error: Exception, status_code: int = 500) -> HTTPException:
     """Handle errors securely without exposing internal details"""
     logger.error(f"Error occurred: {str(error)}", exc_info=True)
     
-    # Return generic error messages to prevent information disclosure
+    # Return error messages
     if status_code == 400:
         message = "Invalid request data provided"
     elif status_code == 429:
@@ -521,7 +521,7 @@ REMEMBER: Use proper markdown formatting with headers (#), bullets (-), bold (**
                         "content": advanced_llm_prompt
                     }
                 ],
-                temperature=0.05,  # Very low temperature for consistent formatting
+                temperature=0.05,  
                 max_tokens=4000
             )
             
