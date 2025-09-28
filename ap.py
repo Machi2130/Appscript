@@ -38,7 +38,7 @@ SERPAPI_KEY = os.getenv("SERPAPI_KEY")
 if not GROQ_API_KEY or not SERPAPI_KEY:
     logger.error("❌ Missing API keys in environment variables")
     # Fallback for demo purposes only - REMOVE IN PRODUCTION
-    GROQ_API_KEY = GROQ_API_KEY or "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"
+    GROQ_API_KEY = GROQ_API_KEY or "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"
     SERPAPI_KEY = SERPAPI_KEY or "fa6233cb8951bad732da19eae092c59d8e37a942806583972e21f9f26b85109c"
 
 GROQ_MODEL = "deepseek-r1-distill-llama-70b"
